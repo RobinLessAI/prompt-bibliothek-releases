@@ -6,6 +6,7 @@ import type { GraphicKind } from '../../state/types.ts';
 import { useUi } from '../../state/ui.tsx';
 import { DemoTag } from '../ui.tsx';
 import { HighlightCard } from './HighlightCard.tsx';
+import { pollView } from '../../sync/snapshot.ts';
 import { PollChart } from './PollChart.tsx';
 import { WordCloud } from './WordCloud.tsx';
 import { WorldMap, type PinCluster } from './WorldMap.tsx';
@@ -95,7 +96,7 @@ export function Presentation() {
           ))}
         </div>
         <div className="row">
-          <DemoTag>Demo · wird nicht ausgespielt</DemoTag>
+          <DemoTag>Präsentation in diesem Fenster · für OBS die Ausgabe-Adressen nutzen</DemoTag>
           <button type="button" className="btn btn--secondary btn--sm" onClick={() => setPresentation(null)} autoFocus>
             <X size={14} aria-hidden /> Schließen <kbd className="kbd">Esc</kbd>
           </button>
@@ -129,7 +130,7 @@ export function Presentation() {
                 )}
               </div>
             )}
-            {presentation === 'umfrage' && <PollChart poll={state.poll} analysis={p} variant="present" />}
+            {presentation === 'umfrage' && <PollChart data={pollView(state.poll, p)} variant="present" />}
             {presentation === 'wortwolke' && <WordCloud terms={derived.cloud.visible} variant="present" />}
             {presentation === 'highlight' && <HighlightCard message={highlight} variant="present" />}
           </div>

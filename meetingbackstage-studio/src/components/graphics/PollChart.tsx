@@ -1,34 +1,34 @@
-import type { PollAnalysis } from '../../state/derive.ts';
+import type { PollView } from '../../sync/snapshot.ts';
 import type { PollState } from '../../state/types.ts';
 
 const SHADES = ['#c9d0d8', '#8f99a5', '#6b7480', '#4d555f', '#b3bcc6', '#7c8691'];
 
+/** Zeichnet Umfrage-Ergebnisse. Bekommt nur die aufbereiteten Daten, damit auch die OBS-Ausgabe sie nutzen kann. */
 export function PollChart({
-  poll,
-  analysis,
+  data,
   variant = 'preview',
   chart,
 }: {
-  poll: PollState;
-  analysis: PollAnalysis;
+  data: PollView;
   variant?: 'preview' | 'present' | 'overlay';
   chart?: PollState['chart'];
 }) {
-  const kind = chart ?? poll.chart;
-  const leaders = new Set(analysis.leaderIds);
+  const kind = chart ?? data.chart;
+  const leaders = new Set(data.leaderIds);
+  const analysis = data;
 
-  if (poll.kind === 'offen') {
-    const answers = analysis.openAnswers.filter((a) => !a.hidden).slice().reverse();
+  if (data.kind === 'offen') {
+    const answers = data.openAnswers.slice().reverse();
     const max = variant === 'present' ? 9 : variant === 'overlay' ? 4 : 6;
     return (
       <div className={`open-answers open-answers--${variant}`}>
         {answers.length === 0 ? (
           <p className="graphic-empty">Noch keine Antworten im Chat.</p>
         ) : (
-          answers.slice(0, max).map(({ message }) => (
-            <blockquote key={message.id} className="open-answer">
-              <p>{message.text}</p>
-              <cite>{message.senderName}</cite>
+          answers.slice(0, max).map((answer) => (
+            <blockquote key={answer.id} className="open-answer">
+              <p>{answer.text}</p>
+              <cite>{answer.sender}</cite>
             </blockquote>
           ))
         )}

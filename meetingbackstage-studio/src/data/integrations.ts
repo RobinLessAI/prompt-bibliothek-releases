@@ -18,43 +18,34 @@ export interface Integration {
 export const INTEGRATIONS: Integration[] = [
   {
     id: 'zoom',
-    name: 'Zoom Meetings und Webinare',
+    name: 'Zoom Meetings',
     category: 'Konferenzplattform',
-    status: 'nicht-verbunden',
+    status: 'demo',
     summary:
-      'Teilnehmerliste, Handzeichen, Mikrofonstatus, Spotlight und Chat kommen im Prototyp aus Beispieldaten. Es besteht keine Verbindung zu einem Zoom-Konto.',
+      'Der Chat kommt live über Zoom Realtime Media Streams (RTMS), Einrichtung oben. Teilnehmerliste, Handzeichen, Spotlight und Stummschalten sind weiterhin simuliert.',
     today: [
-      'Teilnehmende, Handzeichen, Chat und Sprecherstatus sind lokale Beispieldaten.',
-      'Spotlight und „Alle stummschalten“ ändern nur den Simulationszustand.',
-      'Grafiken werden ausschließlich in dieser App angezeigt.',
+      'Live: Chat-Nachrichten aus dem laufenden Meeting über RTMS, sobald die Zoom-App eingerichtet ist.',
+      'Simuliert: Teilnehmende, Handzeichen, Sprecherstatus, Spotlight und „Alle stummschalten“.',
+      'Grafiken gehen über die OBS-Adressen hinaus, nicht in Zoom selbst.',
     ],
     requires: [
       {
-        label: 'Schnittstelle für Steuerung',
-        text: 'Zoom Meeting SDK (Web, Windows, macOS oder Linux). Es bietet Host-Funktionen wie Stummschalten aller Personen, Handzeichen senken und Spotlight. Die App tritt dabei als eigene Teilnehmerin dem Meeting bei.',
+        label: 'Live-Chat (eingebaut)',
+        text: 'Zoom General App (vom Nutzer verwaltet) mit RTMS, Ereignissen meeting.rtms_started und meeting.rtms_stopped sowie dem Bereich meeting:read:meeting_chat. RTMS muss für das Konto freigeschaltet sein; Zoom vergibt den Zugang auf Anfrage.',
       },
       {
-        label: 'Berechtigung im Meeting',
-        text: 'Für Spotlight und „Alle stummschalten“ braucht die verbundene App die Rolle Host oder Co-Host.',
+        label: 'Erreichbarkeit',
+        text: 'Zoom meldet den Meeting-Start an eine öffentliche HTTPS-Adresse. Für den eigenen Rechner reicht ein Tunnel, z. B. ngrok mit fester Adresse oder Cloudflare Tunnel.',
       },
       {
-        label: 'App-Registrierung',
-        text: 'Eine im Zoom App Marketplace registrierte App mit SDK-Zugangsdaten und serverseitig erzeugter Signatur. Für Meetings außerhalb des eigenen Kontos verlangt Zoom zusätzlich ein Nutzer-Token (ZAK oder OBF) und eine geprüfte Produktions-App.',
-      },
-      {
-        label: 'Chat für Grafiken',
-        text: 'Chat-Ereignisse über das Meeting SDK oder Zoom Realtime Media Streams (RTMS, Backend-Dienst mit Webhooks). RTMS muss für das Konto verfügbar und freigegeben sein.',
-      },
-      {
-        label: 'Eigene Galerie-Komposition',
-        text: 'Zugriff auf einzelne Videobilder (Rohdaten) ist nur über SDK oder RTMS mit zusätzlichen Freigaben möglich; Zustimmung der Teilnehmenden und Datenschutz klären.',
+        label: 'Steuerung (später)',
+        text: 'Spotlight, „Alle stummschalten“ und Handzeichen mit Uhrzeit bietet eine Zoom App, die direkt in deinem Zoom-Client läuft (Zoom Apps SDK). Ein eigener Bot-Teilnehmer über das Meeting SDK ist laut Zoom nicht vorgesehen.',
       },
     ],
     questions: [
-      'Welcher Kontotyp und welche Lizenz liegen vor (Meeting, Webinar, Events)?',
-      'Laufen die Veranstaltungen im eigenen Zoom-Konto oder bei Kundschaft?',
-      'Sollen Webinar-Teilnehmende ohne Video (Attendees) ebenfalls ins Spotlight? Dafür müssen sie zu Panelists werden.',
-      'Wie werden Teilnehmende über die Auswertung von Chat-Beiträgen informiert?',
+      'Ist RTMS für dein Zoom-Konto freigeschaltet?',
+      'Wie werden Teilnehmende über die Auswertung des Chats informiert?',
+      'Sollen später auch Webinare unterstützt werden (eigene Ereignisse webinar.rtms_started)?',
     ],
   },
   {

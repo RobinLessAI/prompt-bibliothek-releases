@@ -16,6 +16,7 @@ import {
   X,
 } from 'lucide-react';
 import { PollChart } from '../../components/graphics/PollChart.tsx';
+import { pollView } from '../../sync/snapshot.ts';
 import { Badge, Button, Dialog, Empty, Field, IconButton, Panel, Segmented, Switch } from '../../components/ui.tsx';
 import { optionKey } from '../../lib/poll.ts';
 import { clock } from '../../lib/time.ts';
@@ -229,7 +230,7 @@ export function PollTab() {
               <Vote size={16} aria-hidden /> Die Umfrage ist ein Entwurf. Erst nach dem Start werden Chat-Antworten gezählt.
             </p>
           )}
-          <PollChart poll={poll} analysis={a} />
+          <PollChart data={pollView(poll, a)} />
           {poll.kind === 'auswahl' && (
             <div className="poll-rule">
               <Switch

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Eye, EyeOff, Maximize2 } from 'lucide-react';
-import { Button, DemoTag } from '../../components/ui.tsx';
+import { CopyObsUrlButton } from '../../components/ObsOutputs.tsx';
+import { Button } from '../../components/ui.tsx';
 import { useCommands } from '../../state/commands.ts';
 import { useStore } from '../../state/store.tsx';
 import type { GraphicKind } from '../../state/types.ts';
@@ -36,16 +37,14 @@ export function GraphicHeader({
           onClick={() => commands.toggleGraphic(kind)}
           aria-pressed={shown}
           disabled={!!derived.locked}
-          title={derived.locked ?? 'In der lokalen Galerie-Vorschau einblenden'}
+          title={derived.locked ?? 'Einblenden in der Vorschau und in der OBS-Ausgabe „Programm“'}
         >
-          {shown ? 'Eingeblendet' : 'In Vorschau einblenden'}
+          {shown ? 'Eingeblendet' : 'Einblenden'}
         </Button>
         <Button icon={Maximize2} onClick={() => setPresentation(kind)}>
           Präsentation
         </Button>
-        <DemoTag title="Grafiken werden nur in dieser App angezeigt, nicht in Zoom oder einem Stream">
-          Nur lokal
-        </DemoTag>
+        <CopyObsUrlButton kind={kind} />
       </div>
     </div>
   );

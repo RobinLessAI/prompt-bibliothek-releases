@@ -1,109 +1,115 @@
-# MeetingBackstage Studio – Produktionspult für Online-Meetings (Prototyp)
+# MeetingBackstage Studio
 
-Klickbarer Desktop-Prototyp einer gemeinsamen Produktions-App für Zoom-Workshops, Webinare und hybride Veranstaltungen. Eine Veranstaltung, eine Teilnehmerliste, ein Chat und ein Spotlight-Status bilden die Grundlage für alle Bereiche.
+Produktionspult für Online-Workshops: Der Chat kommt live aus deinem Zoom-Meeting, daraus entstehen Weltkarte, Umfrage, Wortwolke und Chat-Highlight, und diese Grafiken laufen als Browserquellen in OBS.
 
-> **Demo-Prototyp:** Es besteht keine Verbindung zu Zoom, NDI, SDI, SRT, Dante, OSC oder einem Stream Deck. Alle Aktionen ändern ausschließlich den lokalen Zustand im Browser und sind in der Oberfläche als „Demo“ oder „Nicht verbunden“ gekennzeichnet. Es wird nichts aufgezeichnet, übertragen oder an Dritte gesendet.
+## Was live funktioniert und was simuliert ist
+
+| Live | Simuliert (Demo) |
+| --- | --- |
+| Chat aus dem laufenden Zoom-Meeting über Zoom Realtime Media Streams (RTMS) | Teilnehmerliste, Handzeichen, Sprecherstatus |
+| Weltkarte, Umfrage, Wortwolke, Chat-Highlight aus diesem Chat | Spotlight und „Alle stummschalten“ (wirken nicht in Zoom) |
+| Ausgabe der Grafiken an OBS (Browserquelle, transparent) | Galerie-Videobilder, Audiopegel, Stream-Deck-Tasten |
+| Automatisches Speichern einer eigenen Veranstaltung | NDI, SRT, SDI, Dante |
+
+Live-Video der Teilnehmenden ist bewusst nicht enthalten. Für das Zoom-Bild in OBS eignet sich eine Fensteraufnahme des Zoom-Clients; die Grafiken liegen per Browserquelle darüber.
 
 ## Starten
 
-Voraussetzung: Node.js 20.19 oder neuer (getestet mit Node.js 22).
+Voraussetzung: Node.js 20.19 oder neuer (empfohlen: aktuelle LTS-Version von nodejs.org). Zoom, OBS und MeetingBackstage Studio laufen auf demselben Rechner.
 
 ```bash
 cd meetingbackstage-studio
 npm install
-npm run dev        # Entwicklungsserver auf http://localhost:5173
+npm start
 ```
 
-Weitere Befehle:
+`npm start` baut die App und startet den lokalen Server. Danach:
 
-| Befehl | Zweck |
+- **Steuerung:** http://localhost:4300 im Browser öffnen.
+- **OBS:** Adressen unter „Audio & Ausgabe“ kopieren (siehe unten).
+
+Der Server ist nur auf diesem Rechner erreichbar. Eine eigene Veranstaltung („Veranstaltung“ → „Neue Veranstaltung“) wird automatisch unter `daten/veranstaltung.json` gespeichert und nach einem Neustart wiederhergestellt.
+
+## Grafiken in OBS einbinden
+
+1. In OBS: Quelle hinzufügen → **Browser**.
+2. Adresse einfügen, Breite **1920**, Höhe **1080**.
+3. Der Hintergrund ist transparent; die Grafik liegt über dem Zoom-Bild.
+
+| Adresse | Inhalt |
 | --- | --- |
-| `npm run build` | TypeScript-Prüfung und Produktions-Build nach `dist/` |
-| `npm run preview` | Build lokal ansehen (http://localhost:4173) |
-| `npm run typecheck` | Nur TypeScript prüfen |
-| `npm test` | Tests der Chat-Auswertung (Node-Test-Runner) |
-| `npm run map:generate` | Weltkarte aus Natural-Earth-Daten neu erzeugen |
+| `http://localhost:4300/ausgabe.html?grafik=programm` | Die gerade eingeblendete Grafik (Einblendung rechts bzw. Bauchbinde), sonst leer |
+| `http://localhost:4300/ausgabe.html?grafik=karte` | Weltkarte, Vollbild |
+| `http://localhost:4300/ausgabe.html?grafik=umfrage` | Umfrage, Vollbild |
+| `http://localhost:4300/ausgabe.html?grafik=wortwolke` | Wortwolke, Vollbild |
+| `http://localhost:4300/ausgabe.html?grafik=highlight&stil=einblendung` | Chat-Highlight als Bauchbinde |
 
-Optimiert für Laptop- und Desktop-Bildschirme ab etwa 1280 px Breite; kleinere Fenster werden einspaltig.
+Weitere Optionen: `stil=einblendung|vollbild`, `hintergrund=transparent|dunkel`, `sichtbar=programm` (nur zeigen, wenn eingeblendet), `debug=1` (Verbindungsstatus anzeigen). In der Steuerung blendet „Einblenden“ eine Grafik in der Ausgabe „Programm“ ein.
 
-## Bereiche
+## Live-Chat aus Zoom einrichten (einmalig)
 
-1. **Veranstaltung** – Startansicht mit anstehenden Aktionen, Ablaufplan, Verbindungsstatus und Umschalter für eine geplante, laufende oder beendete Demo-Sitzung.
-2. **Teilnehmende** – Liste mit Rolle, Mikrofon, Kamera, Handzeichen (mit Uhrzeit), Sprecherstatus, Suche, Filter und Sortierung. Wortmeldungen nach Eingangszeit, älteste zuerst. Ein Klick setzt eine Person ins Spotlight, ein zweiter Klick entfernt sie. „Alle Teilnehmenden stummschalten“ mit Bestätigung.
-3. **Galerie Studio** – Robin als Moderation groß in der Mitte, Teilnehmende rundherum. Alternativ Spotlight-Bühne und gleichmäßiges Raster. Kachelzahl, Namen, Reaktionen und Handzeichen einstellbar.
-4. **Live Grafiken** – Chat-Simulator, Weltkarte mit Prüfliste, Live-Umfrage (Auswahl oder offene Frage), Wortwolke mit Filtern und Chat-Highlight. Alle vier mit Live-Vorschau, Einblendung in die Galerie-Vorschau und großer Präsentationsansicht.
-5. **Steuerpult und Stream Deck** – anpassbares Raster großer Aktionsflächen, Tastenfeld-Vorschau mit den Handzeichen in Eingangsreihenfolge, Aktionsprotokoll.
-6. **Audio und Ausgabe** – simulierte Pegel und eine Tabelle möglicher Ausgänge (NDI, SRT, SDI, Dante, virtuelle Kamera, Aufnahme).
-7. **Integrationen und Einstellungen** – Karten mit Status, Erklärung und den Voraussetzungen für eine echte Anbindung.
+Der Chat kommt über **Zoom Realtime Media Streams (RTMS)**. Zoom meldet den Start deines Meetings an eine öffentliche HTTPS-Adresse; ein Tunnel leitet diese Meldung an den lokalen Server weiter. Der Chat selbst kommt danach direkt von Zoom.
 
-Tastenkürzel: `Alt` + `1` bis `7` wechselt den Bereich, `N` nächste Hand ins Spotlight, `M` alle stummschalten (mit Bestätigung), `G` Galerie wechseln, `U` Umfrage einblenden, `?` zeigt alle Kürzel.
+1. **RTMS-Zugang:** RTMS muss für dein Zoom-Konto freigeschaltet sein. Laut Zoom-Dokumentation beantragst du den Zugang im Zoom Developer Forum mit einer kurzen Beschreibung deines Anwendungsfalls.
+2. **Zoom-App anlegen:** marketplace.zoom.us → Develop → Build App → **General App** → **User-Managed**.
+   - Unter „Features → Access“: **Event Subscription** aktivieren, Ereignisse `meeting.rtms_started` und `meeting.rtms_stopped` hinzufügen.
+   - Als Endpunkt die Tunnel-Adresse mit `/zoom/webhook` eintragen, z. B. `https://dein-name.ngrok-free.app/zoom/webhook`.
+   - Unter „Scopes“: `meeting:read:meeting_chat` hinzufügen.
+   - Die App in deinem Konto hinzufügen bzw. autorisieren (Local Test).
+3. **Zugangsdaten eintragen:** `.env.example` nach `.env.local` kopieren und `ZOOM_CLIENT_ID`, `ZOOM_CLIENT_SECRET` und `ZOOM_WEBHOOK_SECRET_TOKEN` (Secret Token der Zoom-App) eintragen. Danach `npm start` neu starten.
+4. **Tunnel starten**, z. B. mit ngrok und einer festen kostenlosen Adresse, damit sich die Webhook-Adresse nicht ändert:
+   ```bash
+   ngrok http --url=dein-name.ngrok-free.app 4300
+   ```
+   Alternativ Cloudflare Tunnel. Über den Tunnel ist nur `/zoom/webhook` erreichbar; Steuerung und Ausgaben bleiben lokal.
+5. **Meeting starten.** Sobald Zoom den Datenstrom startet, zeigt die App „Live aus Zoom“ und der Chat erscheint. Je nach Zoom-Einstellung startet der Datenstrom automatisch oder muss im Meeting für die App gestartet werden. Das bitte beim ersten Test prüfen.
+
+Die Seite „Integrationen“ in der App zeigt den Stand jedes Schritts (Zugangsdaten vorhanden, Webhook erreicht, verbunden).
+
+**Notlösung ohne RTMS:** In der App unter „Integrationen“ den Zoom-Ordner beobachten lassen. Nach jedem Klick auf „Chat speichern“ in Zoom übernimmt MeetingBackstage die neuen Nachrichten (nicht live). Nur Nachrichten an alle werden übernommen.
 
 ## Regeln der Chat-Auswertung
 
-- **Weltkarte:** Nur Orte, die eine Person selbst im Chat nennt. Erkennung ausschließlich über ein kleines lokales Ortsverzeichnis (`src/data/places.ts`). Eindeutige Orte müssen bestätigt werden (optional automatisch); mehrdeutige („Frankfurt“, „Halle“) und unbekannte Orte („Grüße aus …“) landen in der Prüfliste. Pro Person zählt der zuletzt bestätigte Ort; Personen am selben Ort werden gruppiert.
-- **Umfrage:** Gültig ist eine Nachricht, die genau einer Kennung (A, B … oder 1, 2 …) oder genau dem Antworttext entspricht. Nachrichten wie „eher B“ oder „B oder C“ gehen zur Prüfung. Standardmäßig zählt pro Person nur die zuletzt abgegebene gültige Antwort.
-- **Wortwolke:** Jeder Begriff zählt pro Nachricht einmal. Filter für Füllwörter, Kurzwörter und Zahlen, unangemessene Begriffe (Beispielliste), Umfrage-Stimmen und Mindestnennungen; einzelne Begriffe lassen sich ausblenden.
-- Beiträge von Moderation, Co-Moderation, Vortrag und Produktion werden nicht ausgewertet.
+- **Team-Namen:** Beiträge der eingetragenen Team-Namen (z. B. deine eigenen Fragen) werden nicht ausgewertet. „Robin“ erfasst auch „Robin Weniger“.
+- **Weltkarte:** Nur Orte, die Personen selbst nennen, erkannt über ein lokales Ortsverzeichnis (`src/data/places.ts`). Eindeutige Orte werden bestätigt (optional automatisch), mehrdeutige und unbekannte landen in der Prüfliste. Pro Person zählt der zuletzt bestätigte Ort.
+- **Umfrage:** Gültig ist genau eine Kennung (A, B … oder 1, 2 …) oder genau der Antworttext. „eher B“ oder „B oder C“ gehen zur Prüfung. Pro Person zählt die zuletzt abgegebene gültige Antwort.
+- **Wortwolke:** Jeder Begriff zählt pro Nachricht einmal; Filter für Füllwörter, Kurzwörter, unangemessene Begriffe und Umfrage-Stimmen.
+- Jede Frage sammelt Beiträge ab ihrem Start („Neu starten“ setzt den Startpunkt auf jetzt).
 
-## Was funktioniert, was simuliert ist
+## Entwicklung
 
-| Vollständig im Prototyp | Nur simuliert |
+| Befehl | Zweck |
 | --- | --- |
-| Gemeinsamer Zustand für alle Bereiche, Änderungen sofort überall sichtbar | Teilnehmende, Chat, Sprecherwechsel und Reaktionen (Beispieldaten, optionale Live-Simulation) |
-| Spotlight an/aus, Mehrfach-Spotlight mit Limit, Reihenfolge | Wirkung von Spotlight und Stummschalten in Zoom |
-| Handzeichen-Warteschlange nach Eingangszeit | Videobilder (stilisierte Kamerabilder) |
-| Ortserkennung, Prüfliste, Pins, Gruppierung | Audiopegel |
-| Umfrage-Zuordnung, Prüfen, Verwerfen, Zurücksetzen, Schließen, offene Frage | Ausgänge NDI, SRT, SDI, Dante (nur Quellenauswahl) |
-| Wortwolke mit Filtern und Ausblenden | Stream-Deck-Tasten (Vorschau im Browser) |
-| Präsentationsansicht, Einblendung in der Galerie-Vorschau | Verbindungstests (enden immer mit „nicht verbunden“) |
+| `npm start` | Bauen und Server starten (Port 4300) |
+| `npm run server` | Nur den Server starten (nutzt den letzten Build) |
+| `npm run dev` | Entwicklungsserver mit Hot Reload (http://localhost:5173); dazu `npm run server` in einem zweiten Terminal |
+| `npm run typecheck` | TypeScript prüfen |
+| `npm test` | Tests: Chat-Auswertung, Zoom-Chat-Format, Server, RTMS-Ablauf (Node 22.18 oder neuer) |
+| `npm run map:generate` | Weltkarte aus Natural-Earth-Daten neu erzeugen |
 
-## Vor einer echten Zoom-Anbindung prüfen
+Der RTMS-Test prüft den Ablauf gegen einen nachgebildeten Zoom-Server nach der Zoom-Dokumentation. Er ersetzt nicht den ersten Test mit einem echten Meeting; Meldungen dazu stehen im Terminal des Servers.
 
-- **Schnittstelle:** Host-Funktionen wie Spotlight, „Alle stummschalten“ und Handzeichen senken bietet das **Zoom Meeting SDK** (Web, Windows, macOS, Linux). Die App tritt dabei selbst dem Meeting bei und braucht die Rolle **Host oder Co-Host**.
-- **App-Registrierung:** App im Zoom App Marketplace mit SDK-Zugangsdaten und serverseitig signiertem Token. Für Meetings außerhalb des eigenen Kontos verlangt Zoom zusätzlich ein Nutzer-Token (ZAK oder OBF) und eine geprüfte Produktions-App.
-- **Chat für Grafiken:** Chat-Ereignisse über das Meeting SDK oder **Zoom Realtime Media Streams (RTMS)**; RTMS ist ein Backend-Dienst und muss für das Konto verfügbar und freigegeben sein.
-- **Webinare:** Attendees haben kein Video; für das Spotlight müssen sie zu Panelists werden.
-- **Eigene Galerie-Komposition:** Zugriff auf einzelne Videobilder (Rohdaten) braucht zusätzliche Freigaben sowie Einwilligung und Datenschutzprüfung.
-- **Datenschutz:** Teilnehmende über die Auswertung von Chat-Beiträgen informieren; Ortsangaben nur aus selbst genannten Beiträgen verwenden.
-
-Weitere Integrationen (Details in der App unter „Integrationen“):
-
-- **Stream Deck:** Plugin auf Basis des Stream Deck SDK oder eine Controller-Software (z. B. Bitfocus Companion) mit lokaler Schnittstelle zur App; alternativ WebHID in Chromium-Browsern.
-- **OSC:** lokaler Dienst oder Desktop-App, da Browser kein UDP senden können.
-- **NDI:** NDI SDK und Lizenzbedingungen, native Anwendung.
-- **SRT:** Software- oder Hardware-Encoder und ein SRT-Ziel.
-- **SDI:** Ein-/Ausgabekarte (z. B. Blackmagic oder AJA) mit Hersteller-SDK.
-- **Dante/Audio:** Dante-Geräte oder Dante Virtual Soundcard (lizenzpflichtig), Audiointerface mit passenden Treibern.
-
-Die Angaben sind vor einer Umsetzung mit der aktuellen Herstellerdokumentation abzugleichen.
-
-## Projektstruktur
+## Aufbau
 
 ```
 meetingbackstage-studio/
-├── scripts/generate-world-map.mjs   # erzeugt src/data/worldMap.ts aus Natural Earth
+├── server/
+│   ├── server.mjs        # lokaler Server: App, OBS-Abgleich, Speichern, Webhook
+│   └── rtms.mjs          # Zoom RTMS: Webhook-Prüfung, Handshakes, Chat-Datenstrom
+├── ausgabe.html          # OBS-Ausgabeseite
 ├── src/
-│   ├── App.tsx                      # Rahmen, Navigation, Tastenkürzel
-│   ├── state/                       # Datenmodell, Reducer, Befehle, Auswertung
-│   │   ├── types.ts                 # gemeinsames Datenmodell
-│   │   ├── reducer.ts               # alle Zustandsänderungen
-│   │   ├── derive.ts                # Karte, Umfrage, Wortwolke aus dem Chat
-│   │   ├── commands.ts              # Befehle mit sichtbarer Rückmeldung
-│   │   └── deckActions.ts           # Aktionen für Steuerpult, Tasten, Kürzel
-│   ├── integrations/adapters.ts     # Integrationsgrenzen (Meeting, Controller, Ausgang)
-│   ├── lib/                         # Ortserkennung, Abstimmung, Wortwolke, Projektion
-│   ├── data/                        # Beispieldaten, Ortsverzeichnis, Integrationskatalog
-│   ├── components/                  # Kacheln, Galerie, Grafiken, Tastenfeld, UI-Bausteine
-│   ├── views/                       # die sieben Bereiche
-│   └── styles/                      # Gestaltung (Tokens, Komponenten, Ansichten)
-└── tests/logic.test.ts              # Tests für die Chat-Auswertung
+│   ├── ausgabe/          # Darstellung für OBS (transparent, 1920 × 1080)
+│   ├── sync/             # Verbindung Steuerung ↔ Server, Momentaufnahmen für OBS
+│   ├── state/            # Datenmodell, Auswertung von Karte, Umfrage, Wortwolke
+│   ├── lib/              # Ortserkennung, Abstimmung, Wortwolke, Zoom-Chat-Datei
+│   ├── components/       # Grafiken, Chat, Live-Chat-Einrichtung, OBS-Adressen
+│   └── views/            # die sieben Bereiche
+└── tests/
 ```
-
-Integrationsgrenze: Die Oberfläche ruft nur lokale Befehle (`src/state/commands.ts`) auf. Ein späterer Adapter implementiert `MeetingAdapter`, `ControllerAdapter` oder `OutputAdapter` (`src/integrations/adapters.ts`) mit einer offiziell unterstützten Schnittstelle, ohne dass sich die Ansichten ändern müssen.
 
 ## Quellen und Lizenzen
 
-- Kartendaten: [Natural Earth](https://www.naturalearthdata.com) (gemeinfrei), über das npm-Paket `world-atlas`.
-- Schriften: Barlow, Barlow Semi Condensed, IBM Plex Mono (SIL Open Font License), lokal über `@fontsource` eingebunden.
-- Symbole: Lucide (ISC-Lizenz).
-- Alle Personen, Orte im Chat und Inhalte der Beispielveranstaltung sind erfunden.
+- Kartendaten: [Natural Earth](https://www.naturalearthdata.com) (gemeinfrei) über `world-atlas`.
+- Schriften: Barlow, Barlow Semi Condensed, IBM Plex Mono (SIL Open Font License), lokal eingebunden.
+- Symbole: Lucide (ISC). WebSocket: `ws` (MIT).
+- Personen und Inhalte der Beispieldaten sind erfunden.

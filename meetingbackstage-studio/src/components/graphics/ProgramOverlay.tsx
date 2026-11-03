@@ -1,5 +1,6 @@
 import { useNow, useStore } from '../../state/store.tsx';
 import { HighlightCard } from './HighlightCard.tsx';
+import { pollView } from '../../sync/snapshot.ts';
 import { PollChart } from './PollChart.tsx';
 import { WordCloud } from './WordCloud.tsx';
 import { WorldMap } from './WorldMap.tsx';
@@ -27,7 +28,7 @@ export function ProgramOverlay() {
           <div className="overlay__body">
             {graphic === 'karte' && <WorldMap pins={derived.map.pins} view={state.map.view} variant="overlay" aspect={1.25} />}
             {graphic === 'umfrage' && (
-              <PollChart poll={state.poll} analysis={derived.poll} variant="overlay" chart="balken" />
+              <PollChart data={pollView(state.poll, derived.poll)} variant="overlay" chart="balken" />
             )}
             {graphic === 'wortwolke' && <WordCloud terms={derived.cloud.visible.slice(0, 18)} variant="overlay" />}
           </div>

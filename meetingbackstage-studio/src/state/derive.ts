@@ -22,9 +22,23 @@ export function personKey(m: ChatMessage): string {
   return m.senderId ?? `name:${m.senderName.trim().toLowerCase()}`;
 }
 
-export function isTeamMessage(m: ChatMessage, byId: Record<string, Participant>): boolean {
+/** Gleicht einen Absendernamen mit den eingetragenen Team-Namen ab („Robin“ passt auch zu „Robin Weniger“). */
+export function matchesTeamName(senderName: string, teamNames: string[]): boolean {
+  const name = senderName.trim().toLowerCase();
+  return teamNames.some((t) => {
+    const team = t.trim().toLowerCase();
+    return !!team && (name === team || name.startsWith(`${team} `));
+  });
+}
+
+export function isTeamMessage(
+  m: ChatMessage,
+  byId: Record<string, Participant>,
+  teamNames: string[] = [],
+): boolean {
   const p = m.senderId ? byId[m.senderId] : undefined;
-  return !!p && TEAM_ROLES.includes(p.role);
+  if (p && TEAM_ROLES.includes(p.role)) return true;
+  return matchesTeamName(m.senderName, teamNames);
 }
 
 export function inCollectWindow(at: number, w: CollectWindow): boolean {
@@ -92,7 +106,7 @@ export function analyzeMap(s: AppState): MapAnalysis {
   const flagged = new Set(s.map.flagged);
   const items: LocationItem[] = [];
   for (const m of s.chat) {
-    if (isTeamMessage(m, byId)) continue;
+    if (isTeamMessage(m, byId, s.settings.teamNames)) continue;
     const isFlagged = flagged.has(m.id);
     if (!isFlagged && !inCollectWindow(m.at, s.map)) continue;
     const detection = detectLocation(m.text);
@@ -167,7 +181,7 @@ export interface PollAnalysis {
 export function analyzePoll(s: AppState): PollAnalysis {
   const { poll } = s;
   const byId = participantsById(s);
-  const messages = s.chat.filter((m) => !isTeamMessage(m, byId) && inPollWindow(m.at, poll));
+  const messages = s.chat.filter((m) => !isTeamMessage(m, byId, s.settings.teamNames) && inPollWindow(m.at, poll));
 
   const result: PollAnalysis = {
     totals: [],
@@ -252,7 +266,7 @@ export function analyzeCloud(s: AppState, poll: PollAnalysis): CloudAnalysis {
   const byId = participantsById(s);
   const messages = s.chat.filter(
     (m) =>
-      !isTeamMessage(m, byId) &&
+      !isTeamMessage(m, byId, s.settings.teamNames) &&
       inCollectWindow(m.at, s.cloud) &&
       !(s.cloud.filters.ignoreVotes && poll.voteMessageIds.has(m.id)),
   );
@@ -296,7 +310,7 @@ export function tagMessages(
     return i >= 0 ? optionKey(i, s.poll.labelStyle) : '?';
   };
   for (const m of s.chat) {
-    const team = isTeamMessage(m, byId);
+    const team = isTeamMessage(m, byId, s.settings.teamNames);
     const loc = locationById.get(m.id);
     const vote = voteById.get(m.id);
     out[m.id] = {

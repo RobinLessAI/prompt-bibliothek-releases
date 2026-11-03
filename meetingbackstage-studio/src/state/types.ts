@@ -73,7 +73,7 @@ export interface MuteAllState {
   affected: string[];
 }
 
-export type ChatSource = 'beispiel' | 'simulator' | 'auto';
+export type ChatSource = 'beispiel' | 'simulator' | 'auto' | 'import' | 'zoom';
 
 export interface ChatMessage {
   id: string;
@@ -83,6 +83,8 @@ export interface ChatMessage {
   text: string;
   at: number;
   source: ChatSource;
+  /** Kennung aus dem Zoom-Chat-Import, verhindert doppelte Übernahme. */
+  importKey?: string;
 }
 
 /** Zeitfenster, in dem Chat-Nachrichten für eine Grafik gezählt werden. */
@@ -203,6 +205,8 @@ export type OutputId = 'ndi' | 'srt' | 'sdi' | 'dante' | 'virtuelle-kamera' | 'a
 export type OutputSource = 'programm' | 'galerie' | 'grafik' | 'moderation' | 'audio-mix';
 
 export interface Settings {
+  /** Namen, deren Chat-Beiträge nicht ausgewertet werden (Moderation, Team). */
+  teamNames: string[];
   autoDemo: boolean;
   lowerHandOnSpotlight: boolean;
   maxSpotlight: number;
@@ -243,6 +247,8 @@ export interface ParticipantView {
 }
 
 export interface AppState {
+  /** Beispieldaten oder eigene Veranstaltung (nur diese wird gespeichert). */
+  dataMode: 'demo' | 'eigene';
   session: SessionState;
   participants: Participant[];
   /** Simulierte sprechende Person. */

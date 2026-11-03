@@ -43,6 +43,7 @@ export type Action =
   | { type: 'muteAll/run'; at: number; allowSelfUnmute: boolean }
   | { type: 'muteAll/dismiss' }
   | { type: 'chat/add'; message: ChatMessage }
+  | { type: 'chat/import'; messages: ChatMessage[] }
   | { type: 'map/decide'; messageId: string; decision: LocationDecision | null }
   | { type: 'map/flag'; messageId: string }
   | { type: 'map/update'; patch: Partial<Pick<MapState, 'question' | 'autoConfirm' | 'view'>> }
@@ -198,6 +199,14 @@ export function reducer(s: AppState, a: Action): AppState {
 
     case 'chat/add':
       return { ...s, chat: [...s.chat, a.message] };
+    case 'chat/import': {
+      const known = new Set(s.chat.map((m) => m.importKey).filter(Boolean));
+      const fresh = a.messages.filter((m) => !m.importKey || !known.has(m.importKey));
+      if (fresh.length === 0) return s;
+      // Chronologisch einsortieren: Die Auswertung („letzte Antwort zählt“) braucht die richtige Reihenfolge.
+      const chat = [...s.chat, ...fresh].sort((x, y) => x.at - y.at);
+      return { ...s, chat };
+    }
 
     case 'map/decide': {
       const decisions = { ...s.map.decisions };

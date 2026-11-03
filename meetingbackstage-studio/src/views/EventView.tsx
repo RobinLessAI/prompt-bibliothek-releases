@@ -12,6 +12,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { GalleryStage } from '../components/GalleryStage.tsx';
+import { NewEventButton } from '../components/NewEvent.tsx';
 import { Badge, Button, DemoTag, NotConnected, Panel, Segmented } from '../components/ui.tsx';
 import { clock, dateLabel, duration, timecode } from '../lib/time.ts';
 import { GRAPHIC_LABEL, SESSION_LABEL, useCommands } from '../state/commands.ts';
@@ -178,13 +179,13 @@ export function EventView() {
           </p>
         </div>
         <div className="view__head-side">
+          <NewEventButton variant={state.dataMode === 'demo' ? 'primary' : 'secondary'} />
           <Segmented<SessionStatus>
-            label="Demo-Sitzung"
+            label="Sitzungsstatus"
             value={session.status}
             onChange={commands.setSessionStatus}
             options={(['geplant', 'laeuft', 'beendet'] as const).map((s) => ({ value: s, label: SESSION_LABEL[s] }))}
           />
-          <DemoTag>Status nur simuliert</DemoTag>
         </div>
       </header>
 
@@ -262,6 +263,9 @@ export function EventView() {
             <div className="progress" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100} aria-label="Fortschritt der Veranstaltung">
               <div className="progress__fill" style={{ width: `${progress}%` }} />
             </div>
+            {session.agenda.length === 0 && (
+              <p className="todo-empty">Kein Ablaufplan hinterlegt. Für eigene Veranstaltungen ist er optional.</p>
+            )}
             <ol className="agenda">
               {session.agenda.map((a, i) => {
                 const state_ = i === currentIdx ? 'current' : elapsedMin >= a.offsetMin + a.durationMin ? 'done' : 'next';

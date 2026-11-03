@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { CircleSlash, Info } from 'lucide-react';
+import { ObsOutputsPanel } from '../components/ObsOutputs.tsx';
 import { MicStatus } from '../components/people.tsx';
 import { Button, DemoTag, NotConnected, Panel } from '../components/ui.tsx';
 import { INTEGRATIONS, type IntegrationId } from '../data/integrations.ts';
@@ -145,16 +146,17 @@ export function AudioView() {
       <header className="view__head">
         <div className="view__titles">
           <span className="eyebrow">Audio und Ausgabe</span>
-          <h1 className="view__title">Pegel und Ausgänge</h1>
-          <p className="view__lead">Simulierte Pegel folgen dem Mikrofon- und Sprecherstatus. Es werden keine Audiogeräte geöffnet und nichts übertragen.</p>
-        </div>
-        <div className="view__head-side">
-          <DemoTag>Pegel simuliert</DemoTag>
+          <h1 className="view__title">Ausgabe für OBS</h1>
+          <p className="view__lead">
+            Die Grafiken laufen als Browserquellen in OBS. Die Audiopegel weiter unten sind simuliert; es werden keine Audiogeräte geöffnet.
+          </p>
         </div>
       </header>
 
+      <ObsOutputsPanel />
+
       <Panel
-        eyebrow="Eingänge"
+        eyebrow="Eingänge · simuliert"
         title="Audiopegel"
         actions={reduced ? <span className="subtle">Reduzierte Bewegung: Aktualisierung einmal pro Sekunde</span> : undefined}
       >

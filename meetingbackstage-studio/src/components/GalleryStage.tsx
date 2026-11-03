@@ -206,7 +206,7 @@ export function GalleryStage({
       {showCaption && (
         <figcaption className="stage__caption">
           <span>Lokale Vorschau · simulierte Kamerabilder</span>
-          <span>Keine Ausspielung nach Zoom oder in einen Stream</span>
+          <span>Grafiken gehen über die OBS-Adressen hinaus, die Videobilder sind simuliert</span>
         </figcaption>
       )}
     </figure>

@@ -1,12 +1,12 @@
 import { MessageSquareQuote } from 'lucide-react';
 import { clock } from '../../lib/time.ts';
-import type { ChatMessage } from '../../state/types.ts';
+import type { HighlightView } from '../../sync/snapshot.ts';
 
 export function HighlightCard({
   message,
   variant = 'preview',
 }: {
-  message: ChatMessage | null;
+  message: HighlightView | null;
   variant?: 'preview' | 'present' | 'overlay';
 }) {
   if (!message) {

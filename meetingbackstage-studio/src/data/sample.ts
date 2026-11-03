@@ -160,6 +160,7 @@ export function createInitialState(now: number = Date.now()): AppState {
   ];
 
   return {
+    dataMode: 'demo',
     session: {
       title: 'Hybrid moderieren: Aufmerksamkeit halten',
       subtitle: 'Online-Workshop mit Seminarraum Köln',
@@ -267,6 +268,7 @@ export function createInitialState(now: number = Date.now()): AppState {
     },
     participantView: { query: '', role: 'alle', status: 'alle', sort: 'liste' },
     settings: {
+      teamNames: [],
       autoDemo: false,
       lowerHandOnSpotlight: false,
       maxSpotlight: 4,

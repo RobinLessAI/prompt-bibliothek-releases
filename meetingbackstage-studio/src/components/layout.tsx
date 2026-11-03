@@ -17,6 +17,8 @@ import { useDeckActions, SHORTCUTS } from '../state/deckActions.ts';
 import { useNow, useStore } from '../state/store.tsx';
 import type { ViewId } from '../state/types.ts';
 import { useUi, VIEWS } from '../state/ui.tsx';
+import { useSync } from '../sync/SyncProvider.tsx';
+import { rtmsLabel } from './LiveChat.tsx';
 import { DemoTag, Dialog, Kbd, Switch } from './ui.tsx';
 
 const ICONS: Record<ViewId, LucideIcon> = {
@@ -103,8 +105,8 @@ export function Sidebar() {
         })}
       </ul>
       <div className="sidebar__foot">
-        <DemoTag>Demo-Modus</DemoTag>
-        <p>Keine Verbindung zu Zoom, Hardware oder Streams. Alle Aktionen ändern nur diese lokale Simulation.</p>
+        <DemoTag>Teilweise Demo</DemoTag>
+        <p>Live: Chat aus Zoom und Grafiken für OBS über den lokalen Server. Simuliert: Teilnehmende, Spotlight, Stummschalten, Audio.</p>
       </div>
     </nav>
   );
@@ -117,6 +119,8 @@ export function TopBar() {
   const { session } = state;
   const spot = state.spotlight.map((id) => derived.byId[id]).filter(Boolean);
   const first = derived.queue.find((q) => !q.inSpotlight);
+  const sync = useSync();
+  const live = rtmsLabel(sync.rtms, sync.available);
 
   let timer = '';
   if (session.status === 'laeuft' && session.startedAt) timer = timecode(now - session.startedAt);
@@ -173,9 +177,9 @@ export function TopBar() {
       )}
 
       <div className="topbar__end">
-        <button type="button" className="demo-status" onClick={() => go('integrationen')} title="Integrationen und Demo-Status anzeigen">
-          <DemoTag>Demo</DemoTag>
-          <span>Zoom nicht verbunden</span>
+        <button type="button" className="demo-status" onClick={() => go('integrationen')} title="Live-Chat und Integrationen anzeigen">
+          {state.dataMode === 'demo' ? <DemoTag>Beispieldaten</DemoTag> : <span className="data-mode">Eigene Veranstaltung</span>}
+          <span className={`demo-status__live demo-status__live--${live.tone}`}>{live.text}</span>
         </button>
         <div className="topbar__sim" title="Live-Simulation: erzeugt Beispiel-Chat, Handzeichen und Reaktionen">
           <Switch

@@ -12,7 +12,9 @@ import {
   Video,
   type LucideIcon,
 } from 'lucide-react';
-import { Button, DemoTag, Dialog, NotConnected, Panel, Segmented, Switch } from '../components/ui.tsx';
+import { ZoomLiveChatSetup } from '../components/LiveChat.tsx';
+import { NewEventButton } from '../components/NewEvent.tsx';
+import { Button, DemoTag, Dialog, Field, NotConnected, Panel, Segmented, Switch } from '../components/ui.tsx';
 import { INTEGRATIONS, STREAMDECK_MAPPING, type Integration, type IntegrationId } from '../data/integrations.ts';
 import { createInitialState } from '../data/sample.ts';
 import { testConnection, type ConnectionState } from '../integrations/adapters.ts';
@@ -126,6 +128,7 @@ function IntegrationCard({ integration, onDetails }: { integration: Integration;
         <Button size="sm" icon={Info} onClick={onDetails}>
           Details
         </Button>
+        {integration.id !== 'zoom' && (
         <Button
           size="sm"
           variant="ghost"
@@ -138,6 +141,7 @@ function IntegrationCard({ integration, onDetails }: { integration: Integration;
         >
           {test?.status === 'verbindet' ? 'Prüft …' : 'Verbindung testen'}
         </Button>
+        )}
       </footer>
     </article>
   );
@@ -157,11 +161,12 @@ export function IntegrationsView() {
           <span className="eyebrow">Integrationen und Einstellungen</span>
           <h1 className="view__title">Integrationen</h1>
           <p className="view__lead">
-            Keine dieser Verbindungen ist im Prototyp aktiv. Die Karten zeigen, welche offiziell unterstützte Schnittstelle, Berechtigung, Lizenz oder
-            Hardware eine echte Anbindung bräuchte.
+            Live verbunden sind der Chat aus Zoom und die Grafik-Ausgabe für OBS. Die Karten darunter zeigen, was weitere Anbindungen bräuchten.
           </p>
         </div>
       </header>
+
+      <ZoomLiveChatSetup />
 
       <div className="int-grid">
         {INTEGRATIONS.map((i) => (
@@ -172,6 +177,20 @@ export function IntegrationsView() {
       <div className="settings-grid">
         <Panel eyebrow="Einstellungen" title="Bedienung">
           <div className="stack">
+            <Field
+              label="Team-Namen (durch Komma getrennt)"
+              htmlFor="team-names"
+              hint="Chat-Beiträge dieser Personen werden nicht ausgewertet. „Robin“ erfasst auch „Robin Weniger“."
+            >
+              <input
+                id="team-names"
+                className="input"
+                defaultValue={s.teamNames.join(', ')}
+                key={s.teamNames.join('|')}
+                placeholder="Robin, Co-Moderation"
+                onBlur={(e) => set({ teamNames: e.target.value.split(',').map((t) => t.trim()).filter(Boolean) })}
+              />
+            </Field>
             <Switch
               checked={s.autoDemo}
               onChange={(v) => set({ autoDemo: v })}
@@ -217,15 +236,18 @@ export function IntegrationsView() {
               Vorgesehene Adapter: <code>MeetingAdapter</code> (Konferenzplattform), <code>ControllerAdapter</code> (Tastenfeld) und{' '}
               <code>OutputAdapter</code> (Video- und Audioausgänge).
             </li>
-            <li>Chat-Auswertung bleibt im Browser. Es werden keine Daten an Dritte gesendet.</li>
+            <li>Die Chat-Auswertung bleibt auf deinem Rechner. Über den Tunnel läuft nur der Startaufruf von Zoom; der Chat selbst kommt direkt von Zoom an den lokalen Server.</li>
           </ul>
         </Panel>
 
-        <Panel eyebrow="Demo" title="Beispieldaten">
+        <Panel eyebrow={state.dataMode === 'demo' ? 'Beispieldaten geladen' : 'Eigene Veranstaltung'} title="Daten">
           <div className="stack">
-            <p className="muted">Setzt Teilnehmende, Chat, Umfrage, Karte, Wortwolke und Steuerpult auf den Ausgangszustand zurück.</p>
+            <p className="muted">
+              Eine eigene Veranstaltung startet ohne Beispieldaten und wird automatisch im Projektordner unter <code>daten/</code> gespeichert.
+            </p>
+            <NewEventButton variant="secondary" />
             <Button icon={RotateCcw} variant="danger" onClick={() => setResetOpen(true)}>
-              Demo-Daten zurücksetzen
+              Beispieldaten laden
             </Button>
           </div>
         </Panel>
@@ -235,7 +257,7 @@ export function IntegrationsView() {
       <Dialog
         open={resetOpen}
         onClose={() => setResetOpen(false)}
-        title="Demo-Daten zurücksetzen?"
+        title="Beispieldaten laden?"
         size="sm"
         footer={
           <>
@@ -256,7 +278,7 @@ export function IntegrationsView() {
           </>
         }
       >
-        <p>Alle Änderungen in dieser Sitzung gehen verloren. Es gibt keine gespeicherten Daten außerhalb dieses Browserfensters.</p>
+        <p>Die Ansicht wird durch Beispieldaten ersetzt. Eine gespeicherte eigene Veranstaltung bleibt im Ordner <code>daten/</code> erhalten und wird beim nächsten Start wiederhergestellt.</p>
       </Dialog>
     </div>
   );

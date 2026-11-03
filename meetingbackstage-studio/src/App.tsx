@@ -5,6 +5,7 @@ import { LockedBanner, MuteAllBanner, MuteAllDialog, Toasts } from './components
 import { SHORTCUTS, useDeckActions } from './state/deckActions.ts';
 import { useAutoDemo } from './state/simulation.ts';
 import { StoreProvider, useStore } from './state/store.tsx';
+import { SyncProvider } from './sync/SyncProvider.tsx';
 import { UiProvider, useUi, VIEWS } from './state/ui.tsx';
 import { AudioView } from './views/AudioView.tsx';
 import { ControlView } from './views/ControlView.tsx';
@@ -17,9 +18,11 @@ import { ParticipantsView } from './views/ParticipantsView.tsx';
 export function App() {
   return (
     <StoreProvider>
-      <UiProvider>
-        <Shell />
-      </UiProvider>
+      <SyncProvider>
+        <UiProvider>
+          <Shell />
+        </UiProvider>
+      </SyncProvider>
     </StoreProvider>
   );
 }

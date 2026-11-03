@@ -5,6 +5,7 @@ import { clock } from '../lib/time.ts';
 import { useCommands } from '../state/commands.ts';
 import type { MessageTags } from '../state/derive.ts';
 import { useStore } from '../state/store.tsx';
+import { LiveChatBadge } from './LiveChat.tsx';
 import { ROLE_LABEL } from './people.tsx';
 import { DemoTag, Empty, Switch } from './ui.tsx';
 
@@ -139,10 +140,13 @@ export function ChatPanel() {
         <div className="panel__titles">
           <span className="eyebrow">Gemeinsamer Chat</span>
           <h2 className="panel__title" id="chat-title">
-            Chat-Simulator <DemoTag>Demo-Datenquelle</DemoTag>
+            Chat {state.dataMode === 'demo' && <DemoTag>Beispieldaten</DemoTag>}
           </h2>
         </div>
-        <span className="subtle tabular">{state.chat.length} Nachrichten</span>
+        <div className="chat__head-side">
+          <LiveChatBadge />
+          <span className="subtle tabular">{state.chat.length} Nachrichten</span>
+        </div>
       </header>
       <div className="chat__filters">
         <Switch checked={showTeam} onChange={setShowTeam} label="Team-Nachrichten zeigen" />

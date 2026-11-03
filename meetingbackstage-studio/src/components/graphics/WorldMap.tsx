@@ -146,6 +146,7 @@ export function WorldMap({
   selectedId,
   onSelect,
   aspect = 2,
+  renderWidth,
 }: {
   pins: MapPin[];
   view: View;
@@ -153,10 +154,12 @@ export function WorldMap({
   selectedId?: string | null;
   onSelect?: (cluster: PinCluster | null) => void;
   aspect?: number;
+  /** Erwartete Breite in Pixeln; bestimmt, wie groß Pins und Beschriftungen erscheinen. */
+  renderWidth?: number;
 }) {
   const vb = useMemo(() => viewBoxFor(view, aspect), [view, aspect]);
   // Größen in Bildschirmpixeln, umgerechnet über eine typische Darstellungsbreite.
-  const refWidth = variant === 'present' ? 1250 : variant === 'overlay' ? 320 : 760;
+  const refWidth = renderWidth ?? (variant === 'present' ? 1250 : variant === 'overlay' ? 320 : 760);
   const px = vb[2] / refWidth;
   const pinBase = (variant === 'present' ? 10 : variant === 'overlay' ? 6 : 7.5) * px;
   const clusters = useMemo(() => clusterPins(pins, pinBase * 2.1), [pins, pinBase]);
