@@ -1,8 +1,8 @@
 {
-  "name": "pultwerk",
+  "name": "meetingbackstage-studio",
   "private": true,
   "version": "0.1.0",
-  "description": "Klickbarer Desktop-Prototyp eines Produktionspults für Online-Workshops, Webinare und hybride Veranstaltungen (Demo, ohne echte Integrationen).",
+  "description": "MeetingBackstage Studio: klickbarer Desktop-Prototyp eines Produktionspults für Online-Meetings und Workshops (Demo, ohne echte Integrationen).",
   "type": "module",
   "scripts": {
     "dev": "vite",

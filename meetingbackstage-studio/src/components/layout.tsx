@@ -42,8 +42,8 @@ export function Brand() {
         <rect x="20" y="14" width="7" height="4" rx="1" fill="var(--text)" />
       </svg>
       <div className="brand__text">
-        <span className="brand__name">Pultwerk</span>
-        <span className="brand__tag">Produktionspult</span>
+        <span className="brand__name">MeetingBackstage</span>
+        <span className="brand__tag">Studio</span>
       </div>
     </div>
   );

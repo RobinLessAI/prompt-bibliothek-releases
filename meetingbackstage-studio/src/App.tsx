@@ -80,7 +80,7 @@ function Shell() {
 
   useEffect(() => {
     const label = VIEWS.find((v) => v.id === view)?.label;
-    document.title = label ? `${label} · Pultwerk` : 'Pultwerk';
+    document.title = label ? `${label} · MeetingBackstage Studio` : 'MeetingBackstage Studio';
   }, [view]);
 
   return (

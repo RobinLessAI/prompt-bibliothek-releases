@@ -1,4 +1,4 @@
-# Pultwerk – Produktionspult für Online-Workshops (Prototyp)
+# MeetingBackstage Studio – Produktionspult für Online-Meetings (Prototyp)
 
 Klickbarer Desktop-Prototyp einer gemeinsamen Produktions-App für Zoom-Workshops, Webinare und hybride Veranstaltungen. Eine Veranstaltung, eine Teilnehmerliste, ein Chat und ein Spotlight-Status bilden die Grundlage für alle Bereiche.
 
@@ -9,7 +9,7 @@ Klickbarer Desktop-Prototyp einer gemeinsamen Produktions-App für Zoom-Workshop
 Voraussetzung: Node.js 20.19 oder neuer (getestet mit Node.js 22).
 
 ```bash
-cd pultwerk
+cd meetingbackstage-studio
 npm install
 npm run dev        # Entwicklungsserver auf http://localhost:5173
 ```
@@ -80,7 +80,7 @@ Die Angaben sind vor einer Umsetzung mit der aktuellen Herstellerdokumentation a
 ## Projektstruktur
 
 ```
-pultwerk/
+meetingbackstage-studio/
 ├── scripts/generate-world-map.mjs   # erzeugt src/data/worldMap.ts aus Natural Earth
 ├── src/
 │   ├── App.tsx                      # Rahmen, Navigation, Tastenkürzel
